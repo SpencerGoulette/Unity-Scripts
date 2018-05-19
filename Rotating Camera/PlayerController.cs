@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        // Obtains movement with mouse
+        // Obtains movement from "movement" keys
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
         
