@@ -13,7 +13,6 @@ public class PlayerController : MonoBehaviour {
     public float movementSpeed = 10.0f;
     public float speed = 4.0f;
     private float moveVertical = 0.0f;
-    private float drag = 500;
 
     // Scoring variables
     private float score = 0.0f;
@@ -29,6 +28,7 @@ public class PlayerController : MonoBehaviour {
     public Text scoreboard;
     public Text win;
     public Text stroke;
+    public Text scoreText;
 
     // Status variables
     private bool showScore = true;
@@ -43,21 +43,20 @@ public class PlayerController : MonoBehaviour {
         SetPower();
         SetStroke();
         win.text = "";
+        scoreText.text = "";
         HoleSelection();
         playerBody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        win.text = "";
+        win.text = "\n \n \n \n Controls: \n Arrow Keys - Camera Movement \n Hold Left Mouse - Prepare Swing \n Drag Mouse Down - Power \n Release Left Mouse - Swing \n Tab - Toggle Scoreboard \n R - Reset \n \n Hit Tab to exit";
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        drag = 1 - playerBody.velocity.x + 1 - playerBody.velocity.z;
-        if(drag < 0)
+        if (strokes > 12)
         {
-            drag = 0.2f;
+            HoleEntered();
         }
-
-        playerBody.drag = drag;
-
         // Reset position
         if (Input.GetKeyDown("r"))
         {
@@ -73,6 +72,7 @@ public class PlayerController : MonoBehaviour {
         // Checks for completed stroke
         if (playerBody.velocity.x < 1 && playerBody.velocity.z < 1)
         {
+            
             float moveHorizontal = 0.0f;
             if (Input.GetMouseButton(0) == true)
             {
@@ -83,6 +83,7 @@ public class PlayerController : MonoBehaviour {
                 }
                 SetPower();
                 swinging = true;
+                scoreText.text = "";
             }
 
             // A stroke
@@ -114,46 +115,51 @@ public class PlayerController : MonoBehaviour {
         if(other.gameObject.CompareTag("Hole"))
         {
             other.gameObject.SetActive(false);
-            scoreCard[hole - 1] = strokes.ToString();
-            strokes = strokes - par + 5;
-            if (strokes == 1)
-            {
-                win.text = "Hole-In-One";
-            }
-            else
-            {
-                switch (strokes)
-                {
-                    case 1:
-                        win.text = "Condor";
-                        break;
-                    case 2:
-                        win.text = "Albatross";
-                        break;
-                    case 3:
-                        win.text = "Eagle";
-                        break;
-                    case 4:
-                        win.text = "Birdie";
-                        break;
-                    case 5:
-                        win.text = "Par";
-                        break;
-                    case 6:
-                        win.text = "Bogey";
-                        break;
-                    case 7:
-                        win.text = "Double Bogey";
-                        break;
-                }
-            }
-
-            DisplayScore();
-
-            // Places ball at the next hole
-            hole++;
-            HoleSelection();
+            HoleEntered();
         }
+    }
+
+    void HoleEntered()
+    {
+        scoreCard[hole - 1] = strokes.ToString();
+        strokes = strokes - par + 5;
+        if (strokes == 1)
+        {
+            scoreText.text = "Hole-In-One";
+        }
+        else
+        {
+            switch (strokes)
+            {
+                case 1:
+                    scoreText.text = "Condor";
+                    break;
+                case 2:
+                    scoreText.text = "Albatross";
+                    break;
+                case 3:
+                    scoreText.text = "Eagle";
+                    break;
+                case 4:
+                    scoreText.text = "Birdie";
+                    break;
+                case 5:
+                    scoreText.text = "Par";
+                    break;
+                case 6:
+                    scoreText.text = "Bogey";
+                    break;
+                case 7:
+                    scoreText.text = "Double Bogey";
+                    break;
+            }
+        }
+
+        DisplayScore();
+
+        // Places ball at the next hole
+        hole++;
+        HoleSelection();
     }
 
     // Shows power of hit
@@ -191,31 +197,42 @@ public class PlayerController : MonoBehaviour {
                 par = 3;
                 break;
             case 3:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(8.0f, 0.5f, 49.0f);
                 HoleReset();
+                par = 3;
                 break;
             case 4:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(-85.0f, 0.5f, 60.0f);
                 HoleReset();
+                par = 4;
                 break;
             case 5:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(-114.0f, 0.5f, 7.0f);
                 HoleReset();
+                par = 3;
                 break;
             case 6:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(-121.0f, 0.5f, -67.5f);
                 HoleReset();
+                par = 5;
                 break;
             case 7:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(-40.0f, 0.5f, -110.0f);
                 HoleReset();
+                par = 3;
                 break;
             case 8:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(20.0f, 0.5f, -69.0f);
                 HoleReset();
+                par = 4;
                 break;
             case 9:
-                respawnVector = new Vector3(0.0f, 0.5f, 0.0f);
+                respawnVector = new Vector3(-40.0f, 0.5f, 16.5f);
+                HoleReset();
+                par = 5;
+                break;
+            case 10:
+                respawnVector = new Vector3(60.0f, 6.0f, -56.0f);
                 HoleReset();
                 break;
         }
@@ -247,5 +264,7 @@ public class PlayerController : MonoBehaviour {
         strokes = 0;
         SetStroke();
         win.text = "";
+        showScore = true;
+        DisplayScore();
     }
 }
