@@ -4,23 +4,31 @@ using UnityEngine;
 
 public class ButtonController : MonoBehaviour {
 
+    // Get gameobjects to allow for button and platform movements
     public GameObject platform;
     public GameObject button;
     public GameObject player;
 
+    // Movement variables
     public float platformSpeed = 4.0f;
     public float moveForward = 1.0f;
     public float buttonSpeed = 1.0f;
 
+    // Button pressed animation variable
+    private float originalPosition;
+    private bool lowerButton = false;
+
+    // Variable for if the player is on the platform
     private bool onPlatform = false;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+    private void Start()
+    {
+        // Grabs the initial position of the button
+        originalPosition = button.transform.position.y;
+    }
+
+    // Update is called once per frame
+    void FixedUpdate () {
         if(platform.transform.position.z < 40)
         {
             platform.transform.Translate(new Vector3(0.0f, 0.0f, -1.0f) * platformSpeed * moveForward * Time.deltaTime);
@@ -30,7 +38,7 @@ public class ButtonController : MonoBehaviour {
             }
         }
 
-        if (button.transform.position.y < 0.5)
+        if (button.transform.position.y < originalPosition && lowerButton == false)
         {
             button.transform.Translate(new Vector3(0.0f, 0.01f, 0.0f) * Time.deltaTime * buttonSpeed);
         }
@@ -40,7 +48,8 @@ public class ButtonController : MonoBehaviour {
     {
         if(other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Box"))
         {
-            if (button.transform.position.y > 0.32)
+            lowerButton = true;
+            if (button.transform.position.y > originalPosition - 0.18)
             {
                 button.transform.Translate(new Vector3(0.0f, -0.01f, 0.0f) * Time.deltaTime * buttonSpeed);
             }
@@ -63,6 +72,7 @@ public class ButtonController : MonoBehaviour {
     {
         if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Box"))
         {
+            lowerButton = false;
             moveForward = -1.0f;
         }
     }

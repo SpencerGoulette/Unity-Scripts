@@ -17,6 +17,8 @@ public class CameraController : MonoBehaviour
     private float yaw = 0.0f;
     private float pitch = 0.0f;
     private float roll = 0.0f;
+
+    // Shifts when antigravity occurs
     private float cameraShift = 0.8f;
     private float antiGravityCamera = 1.0f;
 
@@ -31,13 +33,15 @@ public class CameraController : MonoBehaviour
         yaw -= yawSpeed * antiGravityCamera * Input.GetAxis("Mouse X");
         pitch += pitchSpeed * antiGravityCamera * Input.GetAxis("Mouse Y");
 
+        // If there is antigravity, then rotate camera
         if(playerController.AntiGravity == true && cameraShift > -0.8f)
         {
             cameraShift -= 0.05f;
             antiGravityCamera = -1.0f;
         }
 
-        else if(playerController.AntiGravity == false && cameraShift < 0.8f)
+        // If there isn't antigravity, then rotate camera
+        else if (playerController.AntiGravity == false && cameraShift < 0.8f)
         {
             cameraShift += 0.05f;
             antiGravityCamera = 1.0f;
@@ -46,16 +50,19 @@ public class CameraController : MonoBehaviour
         // Limits camera rotation to top hemisphere
         transform.position = player.transform.position + new Vector3(0.0f, cameraShift, 0.0f);
 
+        // If there is antigravity, then rotate player
         if (playerController.AntiGravity == true && roll < 180.0f)
         {
             roll += 1.0f;
         }
 
-        else if(playerController.AntiGravity == false && roll > 0.0f)
+        // If there isn't antigravity, then rotate player
+        else if (playerController.AntiGravity == false && roll > 0.0f)
         {
             roll -= 1.0f;
         }
         
+        // Applies camera rotations
         transform.eulerAngles = new Vector3(pitch, yaw, roll);
     }
 }
