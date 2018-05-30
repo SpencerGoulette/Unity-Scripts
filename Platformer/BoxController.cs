@@ -4,17 +4,18 @@ using UnityEngine;
 
 public class BoxController : MonoBehaviour {
 
+    // Grabs proper items to use
     private Rigidbody boxBody;
     public GameObject player;
     private PlayerController playerController;
 
-    // Use this for initialization
+    // Grabs script and box's body
     void Start () {
         boxBody = GetComponent<Rigidbody>();
         playerController = player.GetComponent<PlayerController>();
     }
 	
-	// Update is called once per frame
+	// Spawn points for box depending on antigravity
 	void FixedUpdate () {
 		if(boxBody.transform.position.y < -50 || boxBody.transform.position.y > 120)
         {

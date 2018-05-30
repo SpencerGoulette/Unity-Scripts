@@ -14,12 +14,22 @@ public class ButtonController : MonoBehaviour {
     public float moveForward = 1.0f;
     public float buttonSpeed = 1.0f;
 
+    // Limits so that platform boundaries may be customized
+    public float upperLimitX = 0.0f;
+    public float lowerLimitX = 0.0f;
+    public float upperLimitZ = 0.0f;
+    public float lowerLimitZ = 0.0f;
+    public float upperLimitY = 0.0f;
+    public float lowerLimitY = 0.0f;
+
+    // Customizeable directional movement
+    public bool moveInX = false;
+    public bool moveInZ = true;
+    public bool moveInY = false;
+
     // Button pressed animation variable
     private float originalPosition;
     private bool lowerButton = false;
-
-    // Variable for if the player is on the platform
-    private bool onPlatform = false;
 
     private void Start()
     {
@@ -27,17 +37,8 @@ public class ButtonController : MonoBehaviour {
         originalPosition = button.transform.position.y;
     }
 
-    // Update is called once per frame
     void FixedUpdate () {
-        if(platform.transform.position.z < 40)
-        {
-            platform.transform.Translate(new Vector3(0.0f, 0.0f, -1.0f) * platformSpeed * moveForward * Time.deltaTime);
-            if (onPlatform)
-            {
-                player.transform.Translate(new Vector3(0.0f, 0.0f, 1.0f) * platformSpeed * moveForward * Time.deltaTime);
-            }
-        }
-
+        // Button raise animation
         if (button.transform.position.y < originalPosition && lowerButton == false)
         {
             button.transform.Translate(new Vector3(0.0f, 0.01f, 0.0f) * Time.deltaTime * buttonSpeed);
@@ -46,30 +47,72 @@ public class ButtonController : MonoBehaviour {
 
     private void OnTriggerStay(Collider other)
     {
+        // If something is on the button:
         if(other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Box"))
         {
+            // Button lower animation
             lowerButton = true;
             if (button.transform.position.y > originalPosition - 0.18)
             {
                 button.transform.Translate(new Vector3(0.0f, -0.01f, 0.0f) * Time.deltaTime * buttonSpeed);
             }
 
-            platform.transform.Translate(new Vector3(0.0f, 0.0f, -1.0f) * platformSpeed * moveForward * Time.deltaTime / 4);
-
-            if (platform.transform.position.z < 0)
+            if (moveInX)
             {
-                moveForward = -1.0f;
+                // Platform moves
+                platform.transform.Translate(new Vector3(-1.0f, 0.0f, 0.0f) * platformSpeed * moveForward * Time.deltaTime);
+
+                // Platform Boundaries
+                if (platform.transform.position.x < lowerLimitX)
+                {
+                    moveForward = -1.0f;
+                }
+
+                if (platform.transform.position.x > upperLimitX)
+                {
+                    moveForward = 1.0f;
+                }
             }
 
-            if (platform.transform.position.z > 40)
+            if (moveInY)
             {
-                moveForward = 1.0f;
+                // Platform moves
+                platform.transform.Translate(new Vector3(0.0f, -1.0f, 0.0f) * platformSpeed * moveForward * Time.deltaTime);
+
+                // Platform Boundaries
+                if (platform.transform.position.y < lowerLimitY)
+                {
+                    moveForward = -1.0f;
+                }
+
+                if (platform.transform.position.y > upperLimitY)
+                {
+                    moveForward = 1.0f;
+                }
+            }
+
+            if (moveInZ)
+            {
+                // Platform moves
+                platform.transform.Translate(new Vector3(0.0f, 0.0f, -1.0f) * platformSpeed * moveForward * Time.deltaTime);
+
+                // Platform Boundaries
+                if (platform.transform.position.z < lowerLimitZ)
+                {
+                    moveForward = -1.0f;
+                }
+
+                if (platform.transform.position.z > upperLimitZ)
+                {
+                    moveForward = 1.0f;
+                }
             }
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
+        // If nothing is on the button
         if (other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("Box"))
         {
             lowerButton = false;
