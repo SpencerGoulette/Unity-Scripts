@@ -21,47 +21,74 @@ public class CameraController : MonoBehaviour {
     private float cameraShift = 0.8f;
     private float antiGravityCamera = 1.0f;
 
+    // SettingsMenu
+    public GameObject Settings;
+
     private void Start()
     {
         playerController = player.GetComponent<PlayerController>();
+        Settings.SetActive(false);
     }
 
     void FixedUpdate()
     {
-        // Obtains rotation from mouse movement
-        yaw -= yawSpeed * antiGravityCamera * Input.GetAxis("Mouse X");
-        pitch += pitchSpeed * antiGravityCamera * Input.GetAxis("Mouse Y");
-
-        // If there is antigravity, then rotate camera
-        if(playerController.AntiGravity == true && cameraShift > -0.8f)
+        if(Input.GetKey(KeyCode.Escape))
         {
-            cameraShift -= 0.05f;
-            antiGravityCamera = -1.0f;
+            Settings.SetActive(Settings.activeSelf ? false : true);
         }
 
-        // If there isn't antigravity, then rotate camera
-        else if (playerController.AntiGravity == false && cameraShift < 0.8f)
+        if(!(Settings.activeSelf))
         {
-            cameraShift += 0.05f;
-            antiGravityCamera = 1.0f;
+            // Obtains rotation from mouse movement
+            yaw -= yawSpeed * antiGravityCamera * Input.GetAxis("Mouse X");
+            pitch += pitchSpeed * antiGravityCamera * Input.GetAxis("Mouse Y");
+
+            // If there is antigravity, then rotate camera
+            if (playerController.AntiGravity == true && cameraShift > -0.8f)
+            {
+                cameraShift -= 0.05f;
+                antiGravityCamera = -1.0f;
+            }
+
+            // If there isn't antigravity, then rotate camera
+            else if (playerController.AntiGravity == false && cameraShift < 0.8f)
+            {
+                cameraShift += 0.05f;
+                antiGravityCamera = 1.0f;
+            }
+
+            // Limits camera rotation to top hemisphere
+            transform.position = player.transform.position + new Vector3(0.0f, cameraShift, 0.0f);
+
+            // If there is antigravity, then rotate player
+            if (playerController.AntiGravity == true && roll < 180.0f)
+            {
+                roll += 1.0f;
+            }
+
+            // If there isn't antigravity, then rotate player
+            else if (playerController.AntiGravity == false && roll > 0.0f)
+            {
+                roll -= 1.0f;
+            }
+
+            // Applies camera rotations
+            transform.eulerAngles = new Vector3(pitch, yaw, roll);
+        }
+    }
+
+    public void ToggleInvertedControls(bool toggle)
+    {
+        if(toggle)
+        {
+            yawSpeed = 2.0f;
+            pitchSpeed = 2.0f;
         }
 
-        // Limits camera rotation to top hemisphere
-        transform.position = player.transform.position + new Vector3(0.0f, cameraShift, 0.0f);
-
-        // If there is antigravity, then rotate player
-        if (playerController.AntiGravity == true && roll < 180.0f)
+        else
         {
-            roll += 1.0f;
+            yawSpeed = -2.0f;
+            pitchSpeed = -2.0f;
         }
-
-        // If there isn't antigravity, then rotate player
-        else if (playerController.AntiGravity == false && roll > 0.0f)
-        {
-            roll -= 1.0f;
-        }
-        
-        // Applies camera rotations
-        transform.eulerAngles = new Vector3(pitch, yaw, roll);
     }
 }
