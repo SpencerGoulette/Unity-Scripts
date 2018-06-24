@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour {
                 // Gets rid of strafe jumps and increased speeds in the diagonals
                 if (moveHorizontal != 0 && moveVertical != 0)
                 {
-                    playerBody.transform.Translate(movement * movementSpeed / 4);
+                    playerBody.transform.Translate(movement * movementSpeed / 1.4f);
                 }
 
                 // If not going diagonal, then normal movement

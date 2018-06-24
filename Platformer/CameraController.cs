@@ -30,13 +30,26 @@ public class CameraController : MonoBehaviour {
         Settings.SetActive(false);
     }
 
-    void FixedUpdate()
+    private void Update()
     {
-        if(Input.GetKey(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
             Settings.SetActive(Settings.activeSelf ? false : true);
         }
 
+        if (Settings.activeSelf)
+        {
+            Time.timeScale = 0;
+        }
+
+        if (!(Settings.activeSelf))
+        {
+            Time.timeScale = 1;
+        }
+    }
+
+    void FixedUpdate()
+    {
         if(!(Settings.activeSelf))
         {
             // Obtains rotation from mouse movement
