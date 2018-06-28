@@ -35,7 +35,7 @@ public class PlayerController : MonoBehaviour {
     {
         // Initializes Player
         playerBody = GetComponent<Rigidbody>();
-        playerBody.transform.position = new Vector3(0.0f, 1.5f, 0.0f);
+        playerBody.transform.position = new Vector3(0.0f, 2.0f, 0.0f);
     }
 
     // Update is called once per frame
@@ -86,14 +86,12 @@ public class PlayerController : MonoBehaviour {
             if (climbing == false && AntiGravity == false)
             {
                 Physics.gravity = new Vector3(0.0f, -30.0f, 0.0f);
-                toggleGravity = 1.0f;
             }
 
             // No climbing and AntiGravity
             if (climbing == false && AntiGravity == true)
             {
                 Physics.gravity = new Vector3(0.0f, 30.0f, 0.0f);
-                toggleGravity = 0.0f;
             }
 
             // If Moving:
@@ -203,6 +201,19 @@ public class PlayerController : MonoBehaviour {
         if (other.gameObject.CompareTag("Ladder"))
         {
             climbing = false;
+        }
+
+        if (other.gameObject.CompareTag("AntiGravity"))
+        {
+            if (AntiGravity == true)
+            {
+                toggleGravity = 0.0f;
+            }
+
+            else if (AntiGravity == false)
+            {
+                toggleGravity = 1.0f;
+            }
         }
     }
 

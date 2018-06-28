@@ -76,13 +76,13 @@ public class CameraController : MonoBehaviour {
             // If there is antigravity, then rotate player
             if (playerController.AntiGravity == true && roll < 180.0f)
             {
-                roll += 1.0f;
+                roll += 3.0f;
             }
 
             // If there isn't antigravity, then rotate player
             else if (playerController.AntiGravity == false && roll > 0.0f)
             {
-                roll -= 1.0f;
+                roll -= 3.0f;
             }
 
             // Applies camera rotations
