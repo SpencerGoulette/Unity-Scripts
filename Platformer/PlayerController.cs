@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -20,6 +21,10 @@ public class PlayerController : MonoBehaviour {
     public float movementSpeed = 1.0f;
     public float jumpSpeed = 4.0f;
     public float climbingSpeed = 50.0f;
+
+    private float health = 10.0f;
+    public Text healthAmount;
+    private bool dead = true;
 
     // Activity Variables
     private bool grounded = true;
@@ -43,6 +48,13 @@ public class PlayerController : MonoBehaviour {
     {
         // Stops player rotation and falling
         playerBody.transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+
+        healthAmount.text = "Health: " + health.ToString();
+
+        if(health <= 0)
+        {
+
+        }
 
         // Spawn points depending on antigravity
         if (playerBody.transform.position.y < -30)
@@ -172,6 +184,11 @@ public class PlayerController : MonoBehaviour {
         {
             grounded = true;
             //timeManager.NormalMotion();
+        }
+
+        if(other.gameObject.CompareTag("Hurt"))
+        {
+            health -= 1;
         }
 
         // Toggles antigravity
