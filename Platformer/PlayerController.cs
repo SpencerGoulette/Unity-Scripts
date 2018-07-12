@@ -24,7 +24,6 @@ public class PlayerController : MonoBehaviour {
 
     private float health = 10.0f;
     public Text healthAmount;
-    private bool dead = true;
 
     // Activity Variables
     private bool grounded = true;
@@ -49,12 +48,8 @@ public class PlayerController : MonoBehaviour {
         // Stops player rotation and falling
         playerBody.transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
 
+        // Update Player's Health
         healthAmount.text = "Health: " + health.ToString();
-
-        if(health <= 0)
-        {
-
-        }
 
         // Spawn points depending on antigravity
         if (playerBody.transform.position.y < -30)
@@ -69,111 +64,7 @@ public class PlayerController : MonoBehaviour {
 
         if (!(settings.activeSelf))
         {
-            // Climbing and Antigravity cases
-            // Climbing Normally
-            if (climbing == true && AntiGravity == false)
-            {
-                Physics.gravity = new Vector3(0.0f, 0.0f, 0.0f);
-
-                float moveVertical = Input.GetAxis("Vertical");
-
-                movement = new Vector3(0.0f, moveVertical, 0.0f);
-
-                playerBody.transform.Translate(movement * climbingSpeed);
-            }
-
-            // Climbing With AntiGravity
-            if (climbing == true && AntiGravity == true)
-            {
-                Physics.gravity = new Vector3(0.0f, 0.0f, 0.0f);
-
-                float moveVertical = Input.GetAxis("Vertical");
-
-                movement = new Vector3(0.0f, moveVertical, 0.0f);
-
-                playerBody.transform.Translate(-movement * climbingSpeed);
-            }
-
-            // No climbing and No Antigravity
-            if (climbing == false && AntiGravity == false)
-            {
-                Physics.gravity = new Vector3(0.0f, -30.0f, 0.0f);
-            }
-
-            // No climbing and AntiGravity
-            if (climbing == false && AntiGravity == true)
-            {
-                Physics.gravity = new Vector3(0.0f, 30.0f, 0.0f);
-            }
-
-            // If Moving:
-            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
-            {
-                // Allows for easier movement
-                playerBody.drag = 0f;
-
-                // Obtains movement from "movement" keys
-                float moveHorizontal = Input.GetAxis("Horizontal");
-                float moveVertical = Input.GetAxis("Vertical");
-
-                // Applies the calculated force onto the player with antigravity
-                if (AntiGravity)
-                {
-                    float horizontal = moveVertical * Mathf.Sin(-cameraObject.transform.eulerAngles.y / 57.3f) + moveHorizontal * Mathf.Cos(-cameraObject.transform.eulerAngles.y / 57.3f);
-                    float vertical = moveVertical * Mathf.Cos(cameraObject.transform.eulerAngles.y / 57.3f) + moveHorizontal * Mathf.Sin(cameraObject.transform.eulerAngles.y / 57.3f);
-
-                    movement = new Vector3(-horizontal, 0.0f, vertical);
-                }
-
-                // Applies the calculated force onto the player without antigravity
-                else if (AntiGravity == false)
-                {
-                    float horizontal = moveVertical * Mathf.Sin(cameraObject.transform.eulerAngles.y / 57.3f) + moveHorizontal * Mathf.Cos(cameraObject.transform.eulerAngles.y / 57.3f);
-                    float vertical = moveVertical * Mathf.Cos(cameraObject.transform.eulerAngles.y / 57.3f) + -moveHorizontal * Mathf.Sin(cameraObject.transform.eulerAngles.y / 57.3f);
-
-                    movement = new Vector3(horizontal, 0.0f, vertical);
-                }
-
-                // Gets rid of strafe jumps and increased speeds in the diagonals
-                if (moveHorizontal != 0 && moveVertical != 0)
-                {
-                    playerBody.transform.Translate(movement * movementSpeed / 1.4f);
-                }
-
-                // If not going diagonal, then normal movement
-                else
-                {
-                    playerBody.transform.Translate(movement * movementSpeed);
-                }
-            }
-
-            // If moving, then apply drag
-            if (Input.GetAxis("Horizontal") == 0)
-            {
-                playerBody.drag = 2;
-            }
-
-            if (Input.GetAxis("Vertical") == 0)
-            {
-                playerBody.drag = 2;
-            }
-
-            // Jumps if spacebar is pressed and player is on the ground
-            if (grounded == true && Input.GetKey("space"))
-            {
-                //timeManager.SlowMotion();
-                // Flips jump on antigravity
-                if (AntiGravity)
-                {
-                    playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -100.0f, 0.0f));
-                }
-
-                // Normal jumping
-                else
-                {
-                    playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 100.0f, 0.0f));
-                }
-            }
+            Movement();
         }
     }
 
@@ -240,6 +131,115 @@ public class PlayerController : MonoBehaviour {
         if (other.gameObject.CompareTag("Ladder"))
         {
             climbing = true;
+        }
+    }
+
+    private void Movement()
+    {
+        // Climbing and Antigravity cases
+        // Climbing Normally
+        if (climbing == true && AntiGravity == false)
+        {
+            Physics.gravity = new Vector3(0.0f, 0.0f, 0.0f);
+
+            float moveVertical = Input.GetAxis("Vertical");
+
+            movement = new Vector3(0.0f, moveVertical, 0.0f);
+
+            playerBody.transform.Translate(movement * climbingSpeed);
+        }
+
+        // Climbing With AntiGravity
+        if (climbing == true && AntiGravity == true)
+        {
+            Physics.gravity = new Vector3(0.0f, 0.0f, 0.0f);
+
+            float moveVertical = Input.GetAxis("Vertical");
+
+            movement = new Vector3(0.0f, moveVertical, 0.0f);
+
+            playerBody.transform.Translate(-movement * climbingSpeed);
+        }
+
+        // No climbing and No Antigravity
+        if (climbing == false && AntiGravity == false)
+        {
+            Physics.gravity = new Vector3(0.0f, -30.0f, 0.0f);
+        }
+
+        // No climbing and AntiGravity
+        if (climbing == false && AntiGravity == true)
+        {
+            Physics.gravity = new Vector3(0.0f, 30.0f, 0.0f);
+        }
+
+        // If Moving:
+        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        {
+            // Allows for easier movement
+            playerBody.drag = 0f;
+
+            // Obtains movement from "movement" keys
+            float moveHorizontal = Input.GetAxis("Horizontal");
+            float moveVertical = Input.GetAxis("Vertical");
+
+            // Applies the calculated force onto the player with antigravity
+            if (AntiGravity)
+            {
+                float horizontal = moveVertical * Mathf.Sin(-cameraObject.transform.eulerAngles.y / 57.3f) + moveHorizontal * Mathf.Cos(-cameraObject.transform.eulerAngles.y / 57.3f);
+                float vertical = moveVertical * Mathf.Cos(cameraObject.transform.eulerAngles.y / 57.3f) + moveHorizontal * Mathf.Sin(cameraObject.transform.eulerAngles.y / 57.3f);
+
+                movement = new Vector3(-horizontal, 0.0f, vertical);
+            }
+
+            // Applies the calculated force onto the player without antigravity
+            else if (AntiGravity == false)
+            {
+                float horizontal = moveVertical * Mathf.Sin(cameraObject.transform.eulerAngles.y / 57.3f) + moveHorizontal * Mathf.Cos(cameraObject.transform.eulerAngles.y / 57.3f);
+                float vertical = moveVertical * Mathf.Cos(cameraObject.transform.eulerAngles.y / 57.3f) + -moveHorizontal * Mathf.Sin(cameraObject.transform.eulerAngles.y / 57.3f);
+
+                movement = new Vector3(horizontal, 0.0f, vertical);
+            }
+
+            // Gets rid of strafe jumps and increased speeds in the diagonals
+            if (moveHorizontal != 0 && moveVertical != 0)
+            {
+                playerBody.transform.Translate(movement * movementSpeed / 1.4f);
+            }
+
+            // If not going diagonal, then normal movement
+            else
+            {
+                playerBody.transform.Translate(movement * movementSpeed);
+            }
+        }
+
+        // If moving, then apply drag
+        if (Input.GetAxis("Horizontal") == 0)
+        {
+            playerBody.drag = 2;
+        }
+
+        if (Input.GetAxis("Vertical") == 0)
+        {
+            playerBody.drag = 2;
+        }
+
+        // Jumps if spacebar is pressed and player is on the ground
+        if (grounded == true && Input.GetKey("space"))
+        {
+            //timeManager.SlowMotion();
+            // Flips jump on antigravity
+            if (AntiGravity)
+            {
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -100.0f, 0.0f));
+            }
+
+            // Normal jumping
+            else
+            {
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 100.0f, 0.0f));
+            }
         }
     }
 }
