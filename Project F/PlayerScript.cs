@@ -28,10 +28,11 @@ public class PlayerScript : MonoBehaviour {
     public int[] playerStats = new int[] { 0, 1, 1, 1, 1, 1, 1 };
 
     public TextMeshProUGUI playerHealthText;
+    public TextMeshProUGUI playerStatsText;
 
     // Player's EXP
     public int playerLevel = 1;
-    public int playerEXP = 0;
+    public int playerEXP = 8;
     private int[] playerEXPLevelUp = new int[] { 2, 3, 5, 7, 9, 16, 25, 42, 66, 119, 173, 277, 453, 632, 871, 1186, 1659, 2311, 3105, 4468, 6224, 8129, 12410, 16562, 21282};
     
     // Camera
@@ -63,7 +64,15 @@ public class PlayerScript : MonoBehaviour {
 	void FixedUpdate () {
         playerBody.transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
 
-        if(playerStats)
+        for(int i = playerLevel - 1; i < playerLevel; i++)
+        {
+            if (playerEXP > playerEXPLevelUp[i])
+            {
+                playerLevel++;
+                LevelUp();
+                DisplayLevel();
+            }
+        }
 
         if(hasCaboodle && Input.GetKeyDown(KeyCode.E))
         {
@@ -173,5 +182,10 @@ public class PlayerScript : MonoBehaviour {
         {
             playerStatsMax[i] += Random.Range(1,3);
         }
+    }
+
+    public void DisplayLevel()
+    {
+        playerStatsText.text = playerStats[0].ToString("000") + "\n" + playerStats[1].ToString("000") + "\n" + playerStats[2].ToString("000") + "\n" + playerStats[3].ToString("000") + "\n" + playerStats[4].ToString("000") + "\n" + playerStats[5].ToString("000") + "\n" + playerStats[6].ToString("000");
     }
 }
