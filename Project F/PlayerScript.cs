@@ -32,7 +32,8 @@ public class PlayerScript : MonoBehaviour {
 
     // Player's EXP
     public int playerLevel = 1;
-    public int playerEXP = 8;
+    public int playerEXP = 0;
+    private int addOn = 0;
     private int[] playerEXPLevelUp = new int[] { 2, 3, 5, 7, 9, 16, 25, 42, 66, 119, 173, 277, 453, 632, 871, 1186, 1659, 2311, 3105, 4468, 6224, 8129, 12410, 16562, 21282};
     
     // Camera
@@ -180,7 +181,9 @@ public class PlayerScript : MonoBehaviour {
     {
         for(int i = 0; i < 7; i++)
         {
-            playerStatsMax[i] += Random.Range(1,3);
+            addOn = Random.Range(1, 3);
+            playerStatsMax[i] += addOn;
+            playerStats[i] += addOn;
         }
     }
 
