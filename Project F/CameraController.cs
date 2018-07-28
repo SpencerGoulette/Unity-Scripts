@@ -2,46 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour {
+public class CameraController : MonoBehaviour
+{
 
     // The player
     public GameObject player;
 
-    // Shifts when antigravity occurs
-    private float cameraShift = 0.8f;
-
     // Speeds of Camera rotation and radius change
     public float yawSpeed = 2.0f;
     public float pitchSpeed = 2.0f;
+    public float radiusSpeed = 5.0f;
 
     // Rotation, radius, and position of the camera
+    private float radius = 10.0f;
     private float yaw = 0.0f;
-    private float pitch = 0.0f;
+    private float pitch = 35.0f;
+    private float cameraX = 0.0f;
+    private float cameraY = 10.0f;
+    private float cameraZ = 0.0f;
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+    void FixedUpdate()
+    {
 
         // Obtains rotation from mouse movement
         yaw -= yawSpeed * Input.GetAxis("Mouse X");
         pitch += pitchSpeed * Input.GetAxis("Mouse Y");
 
-        if(pitch > 90)
+        // Changes radius based off of mouse's scrollwheel
+        radius += radiusSpeed * Input.GetAxis("Mouse ScrollWheel");
+
+        if (pitch > 90)
         {
             pitch = 90;
         }
 
-        if(pitch < -90)
+        if (pitch < -90)
         {
             pitch = -90;
         }
 
-        transform.position = player.transform.position + new Vector3(0.0f, cameraShift, 0.0f);
+        // Sets limits for the radius
+        if (radius < 0)
+        {
+            radius = 0;
+        }
+        else if (radius > 25)
+        {
+            radius = 25;
+        }
 
+        // Calculates the position of the camera based off the radius, and two angles of rotation
+        cameraY = radius * Mathf.Sin(pitch / 57.3f);
+        cameraX = -radius * Mathf.Sin(yaw / 57.3f) * Mathf.Cos(pitch / 57.3f);
+        cameraZ = -radius * Mathf.Cos(yaw / 57.3f) * Mathf.Cos(pitch / 57.3f);
+
+        // Limits camera rotation to top hemisphere
+        if (cameraY > -2)
+        {
+            transform.position = player.transform.position + new Vector3(cameraX, cameraY, cameraZ) + new Vector3(0.0f, 2.0f, 0.0f);
+        }
+        else
+        {
+            transform.position = player.transform.position + new Vector3(cameraX, -2, cameraZ) + new Vector3(0.0f, 2.0f, 0.0f);
+        }
         transform.eulerAngles = new Vector3(pitch, yaw, 0.0f);
     }
 }

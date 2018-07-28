@@ -6,8 +6,15 @@ using TMPro;
 
 public class PlayerScript : MonoBehaviour {
 
+    float prevAngle = 0.0f;
+
+    public ParticleSystem landed;
+
     // Player's body
     private Rigidbody playerBody;
+
+    //Player Animation
+    Animator anim;
 
     // To check for respawn/reset
     public bool playerAlive = true;
@@ -15,6 +22,7 @@ public class PlayerScript : MonoBehaviour {
     // Player's coins
     public float playerCoins = 0.0f;
     public TextMeshProUGUI coinText;
+    public AudioClip coinGrab;
 
     // Player's inventory
     private bool hasCaboodle = false;
@@ -32,7 +40,7 @@ public class PlayerScript : MonoBehaviour {
 
     // Player's EXP
     public int playerLevel = 1;
-    public int playerEXP = 0;
+    public int playerEXP = 8;
     private int addOn = 0;
     private int[] playerEXPLevelUp = new int[] { 2, 3, 5, 7, 9, 16, 25, 42, 66, 119, 173, 277, 453, 632, 871, 1186, 1659, 2311, 3105, 4468, 6224, 8129, 12410, 16562, 21282};
     
@@ -52,20 +60,35 @@ public class PlayerScript : MonoBehaviour {
     // Respawn vector
     private Vector3 respawnPoint = new Vector3(0, 0, 0);
 
+    //Audio Source
+    private AudioSource audioSource;
+
 	// Use this for initialization
 	void Start () {
+        audioSource = GetComponent<AudioSource>();
         playerBody = GetComponent<Rigidbody>();
         Inventory.SetActive(false);
         PlayerRespawn();
         Physics.gravity = new Vector3(0.0f, -80.0f, 0.0f);
         playerHealthText.text = playerStats[0].ToString("000");
+        anim = GetComponent<Animator>();
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        playerBody.transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+        coinText.fontSize = 64;
 
-        for(int i = playerLevel - 1; i < playerLevel; i++)
+        if(Input.GetKeyDown(KeyCode.N))
+        {
+            anim.SetBool("twist", true);
+        }
+
+        else
+        {
+            anim.SetBool("twist", false);
+        }
+
+        for (int i = playerLevel - 1; i < playerLevel; i++)
         {
             if (playerEXP > playerEXPLevelUp[i])
             {
@@ -94,21 +117,29 @@ public class PlayerScript : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.CompareTag("Coin"))
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            landed.gameObject.transform.position = playerBody.transform.position;
+            landed.Play();
+        }
+
+        if (other.gameObject.CompareTag("Coin"))
         {
             other.gameObject.SetActive(false);
             playerCoins++;
+            coinText.fontSize = 74;
             coinText.text = "$" + playerCoins.ToString("000");
+            audioSource.PlayOneShot(coinGrab, 0.7F);
         }
 
-        if(other.gameObject.CompareTag("Caboodle"))
+        if (other.gameObject.CompareTag("Caboodle"))
         {
             other.gameObject.SetActive(false);
             hasCaboodle = true;
             playerMessage.text = "PRESS [E] TO OPEN CABOODLE";
         }
 
-        if(other.gameObject.CompareTag("Heart"))
+        if (other.gameObject.CompareTag("Heart"))
         {
             for (int i = 0; i < 1; i++)
             {
@@ -120,13 +151,19 @@ public class PlayerScript : MonoBehaviour {
                 }
             }
         }
-    }
 
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            playerStats[0]--;
+            playerHealthText.text = playerStats[0].ToString("000");
+        }
+    }
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject.CompareTag("Ground"))
         {
             grounded = false;
+            landed.Stop();
         }
     }
 
@@ -135,6 +172,7 @@ public class PlayerScript : MonoBehaviour {
         if(other.gameObject.CompareTag("Ground"))
         {
             grounded = true;
+            anim.SetBool("jump", false);
         }
     }
 
@@ -158,22 +196,28 @@ public class PlayerScript : MonoBehaviour {
 
         movement = new Vector3(horizontal, 0.0f, vertical);
 
+        playerBody.transform.eulerAngles = new Vector3(0.0f, prevAngle, 0.0f);
+
         // Gets rid of strafe jumps and increased speeds in the diagonals
-        if (moveHorizontal != 0 && moveVertical != 0)
+        if (moveHorizontal != 0 || moveVertical != 0)
         {
-            playerBody.transform.Translate(movement* movementSpeed / 1.4f);
+            float newAngle = Mathf.Atan2(movement.x, movement.z) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.AngleAxis(newAngle, Vector3.up);
+            playerBody.transform.Translate(Vector3.forward * movementSpeed);
+            anim.SetBool("running", true);
+            prevAngle = newAngle;
         }
 
-        // If not going diagonal, then normal movement
         else
         {
-            playerBody.transform.Translate(movement* movementSpeed);
+            anim.SetBool("running", false);
         }
 
         // Jumps if spacebar is pressed and player is on the ground
         if (grounded == true && Input.GetKey("space"))
         {
             playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 100.0f, 0.0f));
+            anim.SetBool("jump", true);
         }
     }
 

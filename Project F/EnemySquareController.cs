@@ -10,6 +10,7 @@ public class EnemySquareController : MonoBehaviour {
 
     public GameObject heart;
     public int heartDrop;
+    private bool heartDropped = false;
 
     public float movementSpeed = 1.0f;
     private float originalHeight = 0.0f;
@@ -23,18 +24,20 @@ public class EnemySquareController : MonoBehaviour {
 	void FixedUpdate () {
         transform.LookAt(player.transform);
         transform.Translate(Vector3.forward * Time.deltaTime * movementSpeed);
+
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if(other.gameObject.CompareTag("Player"))
         {
-            heartDrop = Random.Range(1, 3);
-            if(heartDrop == 3)
+            heartDrop = Random.Range(1, 4);
+            if(heartDrop == 2 && heartDropped == false)
             {
                 Instantiate(heart, enemy.transform.position, enemy.transform.rotation);
             }
-            Destroy(enemy, 3.0f);
+            heartDropped = true;
+            Destroy(enemy, 0.1f);
         }
     }
 }
