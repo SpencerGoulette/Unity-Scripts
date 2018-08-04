@@ -42,9 +42,9 @@ public class CameraController : MonoBehaviour
         }
 
         // Sets limits for the radius
-        if (radius < 0)
+        if (radius < -1)
         {
-            radius = 0;
+            radius = -1;
         }
         else if (radius > 25)
         {
@@ -59,11 +59,11 @@ public class CameraController : MonoBehaviour
         // Limits camera rotation to top hemisphere
         if (cameraY > -2)
         {
-            transform.position = player.transform.position + new Vector3(cameraX, cameraY, cameraZ) + new Vector3(0.0f, 2.0f, 0.0f);
+            transform.position = player.transform.position + new Vector3(cameraX, cameraY, cameraZ) + new Vector3(0.0f, 3.0f, 0.0f);
         }
         else
         {
-            transform.position = player.transform.position + new Vector3(cameraX, -2, cameraZ) + new Vector3(0.0f, 2.0f, 0.0f);
+            transform.position = player.transform.position + new Vector3(cameraX, -2, cameraZ) + new Vector3(0.0f, 3.0f, 0.0f);
         }
         transform.eulerAngles = new Vector3(pitch, yaw, 0.0f);
     }
