@@ -11,9 +11,6 @@ public class PlayerController : MonoBehaviour {
     // Camera
     public GameObject cameraObject;
 
-    // Time
-    public TimeManager timeManager;
-
     // Settings Menu
     public GameObject settings;
 
@@ -30,6 +27,7 @@ public class PlayerController : MonoBehaviour {
     private bool climbing = false;
     public bool AntiGravity = false;
     private Vector3 movement;
+    private bool swimming = false;
 
     // Gravity toggle variable
     private float toggleGravity = 1.0f;
@@ -60,6 +58,16 @@ public class PlayerController : MonoBehaviour {
         if (playerBody.transform.position.y > 120)
         {
             playerBody.transform.position = new Vector3(-4.0f, 78.5f, 50.0f);
+        }
+
+        if(playerBody.transform.position.y < 0)
+        {
+            swimming = true;
+        }
+
+        if (playerBody.transform.position.y > 0)
+        {
+            swimming = false;
         }
 
         if (!(settings.activeSelf))
@@ -162,19 +170,24 @@ public class PlayerController : MonoBehaviour {
         }
 
         // No climbing and No Antigravity
-        if (climbing == false && AntiGravity == false)
+        if (climbing == false && AntiGravity == false && swimming == false)
         {
             Physics.gravity = new Vector3(0.0f, -30.0f, 0.0f);
         }
 
         // No climbing and AntiGravity
-        if (climbing == false && AntiGravity == true)
+        if (climbing == false && AntiGravity == true && swimming == false)
         {
             Physics.gravity = new Vector3(0.0f, 30.0f, 0.0f);
         }
 
-        // If Moving:
-        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        if (climbing == false && AntiGravity == false && swimming == true)
+        {
+            Physics.gravity = new Vector3(0.0f, -3.0f, 0.0f);
+        }
+
+            // If Moving:
+            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
         {
             // Allows for easier movement
             playerBody.drag = 0f;
@@ -239,6 +252,20 @@ public class PlayerController : MonoBehaviour {
             else
             {
                 playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 100.0f, 0.0f));
+            }
+        }
+
+        else if (Input.GetKey("space") && swimming == true)
+        {
+            if (AntiGravity)
+            {
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -4.0f, 0.0f));
+            }
+
+            // Normal jumping
+            else
+            {
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 4.0f, 0.0f));
             }
         }
     }
