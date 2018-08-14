@@ -119,7 +119,7 @@ public class PlayerScript : MonoBehaviour {
     {
         if (other.gameObject.CompareTag("Ground"))
         {
-            landed.gameObject.transform.position = playerBody.transform.position;
+            landed.gameObject.transform.position = playerBody.transform.position + new Vector3(0.0f, 1.0f, 0.0f);
             landed.Play();
         }
 
