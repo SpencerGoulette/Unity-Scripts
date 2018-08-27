@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour {
     public Text healthAmount;
 
     // Activity Variables
-    private bool grounded = true;
+    public bool grounded = true;
     private bool climbing = false;
     public bool AntiGravity = false;
     private Vector3 movement;
@@ -31,6 +31,8 @@ public class PlayerController : MonoBehaviour {
 
     // Gravity toggle variable
     private float toggleGravity = 1.0f;
+
+    private float coyoteTimer = 0.0f;
 
     // Code that runs at the start of the game
     private void Start()
@@ -110,7 +112,14 @@ public class PlayerController : MonoBehaviour {
         // Sees if the player isn't grounded anymore
         if (other.gameObject.CompareTag("Ground"))
         {
+            while (coyoteTimer < 4.0f)
+            {
+                coyoteTimer += 0.01f;
+            }
+
             grounded = false;
+
+            coyoteTimer = 0.0f;
         }
 
         // Sees if the player isn't climbing
@@ -186,11 +195,11 @@ public class PlayerController : MonoBehaviour {
             Physics.gravity = new Vector3(0.0f, -3.0f, 0.0f);
         }
 
-            // If Moving:
-            if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+        // If Moving:
+        if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
         {
             // Allows for easier movement
-            playerBody.drag = 0f;
+            //playerBody.drag = 0f;
 
             // Obtains movement from "movement" keys
             float moveHorizontal = Input.GetAxis("Horizontal");
@@ -240,32 +249,34 @@ public class PlayerController : MonoBehaviour {
 
         // Jumps if spacebar is pressed and player is on the ground
         if (grounded == true && Input.GetKey("space"))
-        {
+        {   
             //timeManager.SlowMotion();
             // Flips jump on antigravity
             if (AntiGravity)
             {
-                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -100.0f, 0.0f));
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -200.0f, 0.0f));
             }
 
             // Normal jumping
             else
             {
-                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 100.0f, 0.0f));
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 200.0f, 0.0f));
             }
+
+            grounded = false;
         }
 
         else if (Input.GetKey("space") && swimming == true)
         {
             if (AntiGravity)
             {
-                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -4.0f, 0.0f));
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, -10.0f, 0.0f));
             }
 
             // Normal jumping
             else
             {
-                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 4.0f, 0.0f));
+                playerBody.AddForce(jumpSpeed * new Vector3(0.0f, 10.0f, 0.0f));
             }
         }
     }

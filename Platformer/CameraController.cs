@@ -21,6 +21,9 @@ public class CameraController : MonoBehaviour {
     private float cameraShift = 0.8f;
     private float antiGravityCamera = 1.0f;
 
+    private bool noCutScene = false;
+    private float waitTime = 0.0f;
+
     // SettingsMenu
     public GameObject Settings;
 
@@ -28,6 +31,8 @@ public class CameraController : MonoBehaviour {
     {
         playerController = player.GetComponent<PlayerController>();
         Settings.SetActive(false);
+        pitch = -90.0f;
+        transform.eulerAngles = new Vector3(pitch, 0.0f, 0.0f);
     }
 
     private void Update()
@@ -50,8 +55,34 @@ public class CameraController : MonoBehaviour {
 
     void FixedUpdate()
     {
-        if(!(Settings.activeSelf))
+        if(!noCutScene)
         {
+            waitTime += 0.01f;
+            if (waitTime > 3.0f)
+            {
+                if (transform.rotation.x >= 0)
+                {
+                    noCutScene = true;
+                }
+                pitch += 0.1f;
+                transform.eulerAngles = new Vector3(pitch, 0.0f, 0.0f);
+                transform.position = player.transform.position + new Vector3(0.0f, cameraShift, 0.0f);
+            }
+        }
+
+        if(!(Settings.activeSelf) && noCutScene)
+        {
+
+            if (pitch > 90)
+            {
+                pitch = 90;
+            }
+
+            if (pitch < -90)
+            {
+                pitch = -90;
+            }
+
             // Obtains rotation from mouse movement
             yaw -= yawSpeed * antiGravityCamera * Input.GetAxis("Mouse X");
             pitch += pitchSpeed * antiGravityCamera * Input.GetAxis("Mouse Y");
